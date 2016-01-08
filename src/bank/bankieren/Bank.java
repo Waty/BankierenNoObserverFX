@@ -63,16 +63,17 @@ public class Bank implements IBank {
             throw new NumberDoesntExistException("account " + source
                     + " unknown at " + name);
 
+        IRekeningTbvBank dest_account = (IRekeningTbvBank) getRekening(destination);
+        if (dest_account == null)
+            throw new NumberDoesntExistException("account " + destination
+                    + " unknown at " + name);
+
         Money negative = Money.difference(new Money(0, money.getCurrency()),
                 money);
         boolean success = source_account.muteer(negative);
         if (!success)
             return false;
 
-        IRekeningTbvBank dest_account = (IRekeningTbvBank) getRekening(destination);
-        if (dest_account == null)
-            throw new NumberDoesntExistException("account " + destination
-                    + " unknown at " + name);
         success = dest_account.muteer(money);
 
         if (!success) // rollback
