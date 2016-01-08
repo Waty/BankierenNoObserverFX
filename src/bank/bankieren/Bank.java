@@ -9,14 +9,10 @@ import java.util.Map;
 
 public class Bank implements IBank {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -8728841131739353765L;
-    private Map<Integer, IRekeningTbvBank> accounts;
-    private Collection<IKlant> clients;
+    private final Map<Integer, IRekeningTbvBank> accounts;
+    private final Collection<IKlant> clients;
+    private final String name;
     private int nieuwReknr;
-    private String name;
 
     public Bank(String name) {
         accounts = new HashMap<>();
@@ -30,10 +26,12 @@ public class Bank implements IBank {
             return -1;
 
         IKlant klant = getKlant(name, city);
-        IRekeningTbvBank account = new Rekening(nieuwReknr, klant, Money.EURO);
-        accounts.put(nieuwReknr, account);
-        nieuwReknr++;
-        return nieuwReknr - 1;
+        synchronized (accounts) {
+            IRekeningTbvBank account = new Rekening(nieuwReknr, klant, Money.EURO);
+            accounts.put(nieuwReknr, account);
+            nieuwReknr++;
+            return nieuwReknr - 1;
+        }
     }
 
     private IKlant getKlant(String name, String city) {
@@ -68,17 +66,18 @@ public class Bank implements IBank {
             throw new NumberDoesntExistException("account " + destination
                     + " unknown at " + name);
 
-        Money negative = Money.difference(new Money(0, money.getCurrency()),
-                money);
-        boolean success = source_account.muteer(negative);
-        if (!success)
-            return false;
+        synchronized (accounts) {
+            Money negative = Money.difference(new Money(0, money.getCurrency()), money);
+            boolean success = source_account.muteer(negative);
+            if (!success) return false;
 
-        success = dest_account.muteer(money);
+            success = dest_account.muteer(money);
 
-        if (!success) // rollback
-            source_account.muteer(money);
-        return success;
+            if (!success) // rollback
+                source_account.muteer(money);
+
+            return success;
+        }
     }
 
     @Override
