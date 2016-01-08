@@ -1,3 +1,7 @@
+# IDEA
+out/
+.idea/workspace.xml
+
 #################
 ## Eclipse
 #################
