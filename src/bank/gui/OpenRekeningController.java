@@ -6,24 +6,24 @@
 package bank.gui;
 
 import bank.internettoegang.IBalie;
-import bank.internettoegang.IBankiersessie;
-import java.net.URL;
-import java.rmi.RemoteException;
-import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 
+import java.net.URL;
+import java.rmi.RemoteException;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * FXML Controller class
  *
  * @author frankcoenen
  */
-public class OpenRekeningController  implements Initializable {
+public class OpenRekeningController implements Initializable {
 
     @FXML
     private TextField tfName;
@@ -35,13 +35,13 @@ public class OpenRekeningController  implements Initializable {
     private Button btRegister;
 
     private IBalie balie;
-    private  BankierClient application;
-       
+    private BankierClient application;
+
     public void setApp(BankierClient application, IBalie balie) {
         this.application = application;
         this.balie = balie;
     }
-    
+
     /**
      * Initializes the controller class.
      */
@@ -60,7 +60,7 @@ public class OpenRekeningController  implements Initializable {
             if (accountNaam == null) {
                 return;
             }
-            System.out.println("account:"+accountNaam);
+            System.out.println("account:" + accountNaam);
             application.gotoLogin(balie, accountNaam);
         } catch (RemoteException ex) {
             Logger.getLogger(OpenRekeningController.class.getName()).log(Level.SEVERE, null, ex);

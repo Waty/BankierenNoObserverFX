@@ -9,15 +9,16 @@ import bank.bankieren.IRekening;
 import bank.internettoegang.IBalie;
 import bank.internettoegang.IBankiersessie;
 import fontys.util.InvalidSessionException;
-import java.net.URL;
-import java.rmi.RemoteException;
-import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+
+import java.net.URL;
+import java.rmi.RemoteException;
+import java.util.ResourceBundle;
 
 /**
  * FXML Controller class
