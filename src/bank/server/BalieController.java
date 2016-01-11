@@ -1,13 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package bank.server;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -45,18 +37,14 @@ public class BalieController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
 
         cbSelectBank1.getItems().addAll(FXCollections.observableArrayList("RaboBank", "ING", "SNS", "ABN AMRO", "ASN"));
-
-        cbSelectBank1.valueProperty().addListener(new ChangeListener() {
-                                                      @Override
-                                                      public void changed(ObservableValue ov, Object t, Object t1) {
-                                                          bankNaam = (String) ov.getValue();
-                                                          if (application.startBalie(bankNaam)) {
-                                                              taMessage.setText(bankNaam + " bank is online");
-                                                          } else {
-                                                              taMessage.setText("Connection Failed");
-                                                          }
-                                                      }
-                                                  }
+        cbSelectBank1.valueProperty().addListener((ov, t, t1) -> {
+                    bankNaam = ov.getValue();
+                    if (application.startBalie(bankNaam)) {
+                        taMessage.setText(bankNaam + " bank is online");
+                    } else {
+                        taMessage.setText("Connection Failed");
+                    }
+                }
         );
     }
 

@@ -8,7 +8,6 @@ package bank.server;
 import bank.bankieren.Bank;
 import bank.gui.BankierClient;
 import bank.internettoegang.Balie;
-import bank.internettoegang.IBalie;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -20,7 +19,9 @@ import javafx.stage.Stage;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.rmi.Naming;
+import java.rmi.registry.LocateRegistry;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,7 +34,6 @@ public class BalieServer extends Application {
     private final double MINIMUM_WINDOW_WIDTH = 600.0;
     private final double MINIMUM_WINDOW_HEIGHT = 200.0;
     private Stage stage;
-    private String nameBank;
 
     /**
      * @param args the command line arguments
@@ -59,32 +59,18 @@ public class BalieServer extends Application {
     }
 
     public boolean startBalie(String nameBank) {
+        int port = 1099;
 
-        FileOutputStream out = null;
-        try {
-            this.nameBank = nameBank;
-            String address = java.net.InetAddress.getLocalHost().getHostAddress();
-            int port = 1099;
+        try (FileOutputStream out = new FileOutputStream(nameBank + ".props")) {
             Properties props = new Properties();
-            String rmiBalie = address + ":" + port + "/" + nameBank;
-            props.setProperty("balie", rmiBalie);
-            out = new FileOutputStream(nameBank + ".props");
+            props.setProperty("balie", String.format("%s:%d/%s", InetAddress.getLocalHost().getHostAddress(), port, nameBank));
             props.store(out, null);
-            out.close();
-            java.rmi.registry.LocateRegistry.createRegistry(port);
-            IBalie balie = new Balie(new Bank(nameBank));
-            Naming.rebind(nameBank, balie);
-
+            LocateRegistry.createRegistry(port);
+            Naming.rebind(nameBank, new Balie(new Bank(nameBank)));
             return true;
 
         } catch (IOException ex) {
             Logger.getLogger(BalieServer.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                out.close();
-            } catch (IOException ex) {
-                Logger.getLogger(BalieServer.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
         return false;
     }
@@ -100,14 +86,11 @@ public class BalieServer extends Application {
 
     private Initializable replaceSceneContent(String fxml) throws Exception {
         FXMLLoader loader = new FXMLLoader();
-        InputStream in = BalieServer.class.getResourceAsStream(fxml);
         loader.setBuilderFactory(new JavaFXBuilderFactory());
         loader.setLocation(BalieServer.class.getResource(fxml));
         AnchorPane page;
-        try {
+        try (InputStream in = BalieServer.class.getResourceAsStream(fxml)) {
             page = loader.load(in);
-        } finally {
-            in.close();
         }
         Scene scene = new Scene(page, 800, 600);
         stage.setScene(scene);
