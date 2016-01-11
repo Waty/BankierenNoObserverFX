@@ -9,11 +9,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-
 public class BankiersessieTest {
     public static final String HENK = "HENK";
     public static final String TILBURG = "TILBURG";
-    public static final String TEST_1 = "TEST1";
+    public static final String TEST = "TEST";
 
     IBalie balie;
     IBank bank;
@@ -24,9 +23,8 @@ public class BankiersessieTest {
     public void setUp() throws Exception {
         bank = new Bank("TestBank");
         balie = new Balie(bank);
-        rekening = balie.openRekening(HENK, TILBURG, TEST_1);
-
-        bankiersessie = balie.logIn(rekening, TEST_1);
+        rekening = balie.openRekening(HENK, TILBURG, TEST);
+        bankiersessie = balie.logIn(rekening, TEST);
     }
 
     @Test
@@ -36,10 +34,9 @@ public class BankiersessieTest {
 
     @Test
     public void testMaakOver() throws Exception {
-        String HENK2 = "HENK2";
-        String newRekening = balie.openRekening(HENK2, TILBURG, TEST_1);
-        IBankiersessie newSession = balie.logIn(newRekening, TEST_1);
-
+        String henk = "HENK";
+        String newRekening = balie.openRekening(henk, TILBURG, TEST);
+        IBankiersessie newSession = balie.logIn(newRekening, TEST);
         assertTrue(bankiersessie.maakOver(newSession.getRekening().getNr(), new Money(1, Money.EURO)));
     }
 
@@ -51,9 +48,7 @@ public class BankiersessieTest {
     @Test
     public void testLogUit() throws Exception {
         assertTrue(bankiersessie.isGeldig());
-
         bankiersessie.logUit();
-
-//        assertFalse(bankiersessie.isGeldig());
+        //assertFalse(bankiersessie.isGeldig());
     }
 }
