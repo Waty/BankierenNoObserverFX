@@ -10,10 +10,10 @@ public class Money implements Serializable, Comparable<Money> {
     public static final String EURO = "\u20AC";
     private static final long serialVersionUID = 1L;
 
-/*	private Money() {
-        currency="undefined";
-	}
-*/
+    /*	private Money() {
+            currency="undefined";
+        }
+    */
     private String currency;
     private long cents;
 

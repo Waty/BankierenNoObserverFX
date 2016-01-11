@@ -9,6 +9,7 @@ import bank.bankieren.IRekening;
 import bank.bankieren.Money;
 import bank.internettoegang.IBalie;
 import bank.internettoegang.IBankiersessie;
+import fontys.observer.RemotePropertyListener;
 import fontys.util.InvalidSessionException;
 import fontys.util.NumberDoesntExistException;
 import javafx.event.ActionEvent;
@@ -19,8 +20,10 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
+import java.beans.PropertyChangeEvent;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +33,7 @@ import java.util.logging.Logger;
  *
  * @author frankcoenen
  */
-public class BankierSessieController implements Initializable {
+public class BankierSessieController extends UnicastRemoteObject implements Initializable, RemotePropertyListener {
 
     @FXML
     private Hyperlink hlLogout;
@@ -55,18 +58,17 @@ public class BankierSessieController implements Initializable {
     private IBalie balie;
     private IBankiersessie sessie;
 
+    public BankierSessieController() throws RemoteException {
+    }
+
     public void setApp(BankierClient application, IBalie balie, IBankiersessie sessie) {
         this.balie = balie;
         this.sessie = sessie;
         this.application = application;
-        IRekening rekening = null;
+
         try {
-            rekening = sessie.getRekening();
-            tfAccountNr.setText(rekening.getNr() + "");
-            tfBalance.setText(rekening.getSaldo() + "");
-            String eigenaar = rekening.getEigenaar().getNaam() + " te "
-                    + rekening.getEigenaar().getPlaats();
-            tfNameCity.setText(eigenaar);
+            sessie.addListener(this, null);
+            setRekening(sessie.getRekening());
         } catch (InvalidSessionException ex) {
             taMessage.setText("bankiersessie is verlopen");
             Logger.getLogger(BankierSessieController.class.getName()).log(Level.SEVERE, null, ex);
@@ -75,6 +77,12 @@ public class BankierSessieController implements Initializable {
             taMessage.setText("verbinding verbroken");
             Logger.getLogger(BankierSessieController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private void setRekening(IRekening rekening) {
+        tfAccountNr.setText(rekening.getNr() + "");
+        tfBalance.setText(rekening.getSaldo() + "");
+        tfNameCity.setText(rekening.getEigenaar().getNaam() + " te " + rekening.getEigenaar().getPlaats());
     }
 
     /**
@@ -111,5 +119,10 @@ public class BankierSessieController implements Initializable {
             e1.printStackTrace();
             taMessage.setText(e1.getMessage());
         }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent propertyChangeEvent) throws RemoteException {
+        setRekening((IRekening) propertyChangeEvent.getNewValue());
     }
 }

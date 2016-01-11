@@ -4,7 +4,7 @@ import fontys.util.NumberDoesntExistException;
 
 import java.util.*;
 
-public class Bank implements IBank {
+public class Bank extends Observable implements IBank {
 
     private final Map<Integer, IRekeningTbvBank> accounts;
     private final Collection<IKlant> clients;
@@ -62,6 +62,12 @@ public class Bank implements IBank {
 
             if (!success) // rollback
                 source_account.muteer(money);
+            else {
+                setChanged();
+                notifyObservers(source_account);
+                setChanged();
+                notifyObservers(dest_account);
+            }
 
             return success;
         }
@@ -72,4 +78,10 @@ public class Bank implements IBank {
         return name;
     }
 
+    @Override
+    public synchronized void addObserver(Observer observer) {
+        super.addObserver(observer);
+
+        System.out.println("observer count for " + getName() + " = " + countObservers());
+    }
 }

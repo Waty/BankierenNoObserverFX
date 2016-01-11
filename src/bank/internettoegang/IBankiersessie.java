@@ -2,13 +2,13 @@ package bank.internettoegang;
 
 import bank.bankieren.IRekening;
 import bank.bankieren.Money;
+import fontys.observer.RemotePublisher;
 import fontys.util.InvalidSessionException;
 import fontys.util.NumberDoesntExistException;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface IBankiersessie extends Remote {
+public interface IBankiersessie extends RemotePublisher {
 
     long GELDIGHEIDSDUUR = 600000;
 
@@ -24,7 +24,6 @@ public interface IBankiersessie extends Remote {
      * er wordt bedrag overgemaakt van de bankrekening met het nummer bron naar
      * de bankrekening met nummer bestemming
      *
-     * @param bron
      * @param bestemming is ongelijk aan rekeningnummer van deze bankiersessie
      * @param bedrag     is groter dan 0
      * @return <b>true</b> als de overmaking is gelukt, anders <b>false</b>

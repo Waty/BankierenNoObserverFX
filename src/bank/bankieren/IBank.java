@@ -2,6 +2,8 @@ package bank.bankieren;
 
 import fontys.util.NumberDoesntExistException;
 
+import java.util.Observer;
+
 /**
  * @author 871059
  */
@@ -44,4 +46,8 @@ public interface IBank {
      * @return de naam van deze bank
      */
     String getName();
+
+    void addObserver(Observer o);
+
+    void deleteObserver(Observer var1);
 }

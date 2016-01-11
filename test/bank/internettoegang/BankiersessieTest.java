@@ -1,4 +1,3 @@
-
 package bank.internettoegang;
 
 import bank.bankieren.Bank;
@@ -7,7 +6,8 @@ import bank.bankieren.Money;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class BankiersessieTest {
     public static final String HENK = "HENK";

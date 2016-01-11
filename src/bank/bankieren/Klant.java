@@ -2,11 +2,6 @@ package bank.bankieren;
 
 class Klant implements IKlant {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -6216851042931199453L;
-
     private String naam;
 
     private String plaats;
@@ -24,8 +19,7 @@ class Klant implements IKlant {
         return plaats;
     }
 
-    public int compareTo(IKlant arg0) {
-        IKlant klant = arg0;
+    public int compareTo(IKlant klant) {
         int comp = naam.compareTo(klant.getNaam());
         if (comp != 0) return comp;
         return plaats.compareTo(klant.getPlaats());
