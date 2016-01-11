@@ -3,9 +3,9 @@ package bank.internettoegang;
 
 public class LoginAccount implements ILoginAccount {
 
-    private String naam;
-    private String wachtwoord;
-    private int reknr;
+    private final String naam;
+    private final String wachtwoord;
+    private final int reknr;
 
     public LoginAccount(String naam, String wachtwoord, int rekening) {
         this.naam = naam;
