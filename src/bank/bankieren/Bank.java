@@ -2,10 +2,7 @@ package bank.bankieren;
 
 import fontys.util.NumberDoesntExistException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Bank implements IBank {
 
@@ -22,8 +19,7 @@ public class Bank implements IBank {
     }
 
     public int openRekening(String name, String city) {
-        if (name.equals("") || city.equals(""))
-            return -1;
+        if (name.equals("") || city.equals("")) return -1;
 
         IKlant klant = getKlant(name, city);
         synchronized (accounts) {
@@ -35,10 +31,9 @@ public class Bank implements IBank {
     }
 
     private IKlant getKlant(String name, String city) {
-        for (IKlant k : clients) {
-            if (k.getNaam().equals(name) && k.getPlaats().equals(city))
-                return k;
-        }
+        Optional<IKlant> any = clients.stream().filter(k -> k.getNaam().equals(name) && k.getPlaats().equals(city)).findAny();
+        if (any.isPresent()) return any.get();
+
         IKlant klant = new Klant(name, city);
         clients.add(klant);
         return klant;
@@ -48,23 +43,15 @@ public class Bank implements IBank {
         return accounts.get(nr);
     }
 
-    public boolean maakOver(int source, int destination, Money money)
-            throws NumberDoesntExistException {
-        if (source == destination)
-            throw new RuntimeException(
-                    "cannot transfer money to your own account");
-        if (!money.isPositive())
-            throw new RuntimeException("money must be positive");
+    public boolean maakOver(int src, int dst, Money money) throws NumberDoesntExistException {
+        if (src == dst) throw new RuntimeException("cannot transfer money to your own account");
+        if (!money.isPositive()) throw new RuntimeException("money must be positive");
 
-        IRekeningTbvBank source_account = (IRekeningTbvBank) getRekening(source);
-        if (source_account == null)
-            throw new NumberDoesntExistException("account " + source
-                    + " unknown at " + name);
+        IRekeningTbvBank source_account = (IRekeningTbvBank) getRekening(src);
+        if (source_account == null) throw new NumberDoesntExistException("account " + src + " unknown at " + name);
 
-        IRekeningTbvBank dest_account = (IRekeningTbvBank) getRekening(destination);
-        if (dest_account == null)
-            throw new NumberDoesntExistException("account " + destination
-                    + " unknown at " + name);
+        IRekeningTbvBank dest_account = (IRekeningTbvBank) getRekening(dst);
+        if (dest_account == null) throw new NumberDoesntExistException("account " + dst + " unknown at " + name);
 
         synchronized (accounts) {
             Money negative = Money.difference(new Money(0, money.getCurrency()), money);

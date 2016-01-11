@@ -9,10 +9,7 @@ import fontys.util.NumberDoesntExistException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class Bankiersessie extends UnicastRemoteObject implements
-        IBankiersessie {
-
-    private static final long serialVersionUID = 1L;
+public class Bankiersessie extends UnicastRemoteObject implements IBankiersessie {
     private long laatsteAanroep;
     private int reknr;
     private IBank bank;
@@ -21,7 +18,6 @@ public class Bankiersessie extends UnicastRemoteObject implements
         laatsteAanroep = System.currentTimeMillis();
         this.reknr = reknr;
         this.bank = bank;
-
     }
 
     public boolean isGeldig() {
@@ -29,33 +25,23 @@ public class Bankiersessie extends UnicastRemoteObject implements
     }
 
     @Override
-    public boolean maakOver(int bestemming, Money bedrag)
-            throws NumberDoesntExistException, InvalidSessionException,
-            RemoteException {
-
+    public boolean maakOver(int bestemming, Money bedrag) throws NumberDoesntExistException, InvalidSessionException, RemoteException {
         updateLaatsteAanroep();
 
-        if (reknr == bestemming)
-            throw new RuntimeException(
-                    "source and destination must be different");
-        if (!bedrag.isPositive())
-            throw new RuntimeException("amount must be positive");
+        if (reknr == bestemming) throw new RuntimeException("source and destination must be different");
+        if (!bedrag.isPositive()) throw new RuntimeException("amount must be positive");
 
         return bank.maakOver(reknr, bestemming, bedrag);
     }
 
     private void updateLaatsteAanroep() throws InvalidSessionException {
-        if (!isGeldig()) {
-            throw new InvalidSessionException("session has been expired");
-        }
+        if (!isGeldig()) throw new InvalidSessionException("session has been expired");
 
         laatsteAanroep = System.currentTimeMillis();
     }
 
     @Override
-    public IRekening getRekening() throws InvalidSessionException,
-            RemoteException {
-
+    public IRekening getRekening() throws InvalidSessionException, RemoteException {
         updateLaatsteAanroep();
 
         return bank.getRekening(reknr);
@@ -65,5 +51,4 @@ public class Bankiersessie extends UnicastRemoteObject implements
     public void logUit() throws RemoteException {
         UnicastRemoteObject.unexportObject(this, true);
     }
-
 }
