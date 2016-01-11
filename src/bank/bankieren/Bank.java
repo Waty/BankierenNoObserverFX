@@ -1,10 +1,11 @@
 package bank.bankieren;
 
+import fontys.observer.BasicPublisher;
 import fontys.util.NumberDoesntExistException;
 
 import java.util.*;
 
-public class Bank extends Observable implements IBank {
+public class Bank extends BasicPublisher implements IBank {
 
     private final Map<Integer, IRekeningTbvBank> accounts;
     private final Collection<IKlant> clients;
@@ -12,6 +13,7 @@ public class Bank extends Observable implements IBank {
     private int nieuwReknr;
 
     public Bank(String name) {
+        super(new String[]{});
         accounts = new HashMap<>();
         clients = new ArrayList<>();
         nieuwReknr = 100000000;
@@ -25,6 +27,7 @@ public class Bank extends Observable implements IBank {
         synchronized (accounts) {
             IRekeningTbvBank account = new Rekening(nieuwReknr, klant, Money.EURO);
             accounts.put(nieuwReknr, account);
+            addProperty(nieuwReknr + "");
             nieuwReknr++;
             return nieuwReknr - 1;
         }
@@ -60,13 +63,11 @@ public class Bank extends Observable implements IBank {
 
             success = dest_account.muteer(money);
 
-            if (!success) // rollback
+            if (success) {
+                inform(this, dest_account.getNr() + "", null, dest_account);
+                inform(this, source_account.getNr() + "", null, source_account);
+            } else { // rollback
                 source_account.muteer(money);
-            else {
-                setChanged();
-                notifyObservers(source_account);
-                setChanged();
-                notifyObservers(dest_account);
             }
 
             return success;
@@ -76,12 +77,5 @@ public class Bank extends Observable implements IBank {
     @Override
     public String getName() {
         return name;
-    }
-
-    @Override
-    public synchronized void addObserver(Observer observer) {
-        super.addObserver(observer);
-
-        System.out.println("observer count for " + getName() + " = " + countObservers());
     }
 }

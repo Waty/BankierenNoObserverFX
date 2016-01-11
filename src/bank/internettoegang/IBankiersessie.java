@@ -2,18 +2,19 @@ package bank.internettoegang;
 
 import bank.bankieren.IRekening;
 import bank.bankieren.Money;
-import fontys.observer.RemotePublisher;
+import fontys.observer.RemotePropertyListener;
 import fontys.util.InvalidSessionException;
 import fontys.util.NumberDoesntExistException;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface IBankiersessie extends RemotePublisher {
+public interface IBankiersessie extends Remote {
 
     long GELDIGHEIDSDUUR = 600000;
 
     /**
-     * @returns true als de laatste aanroep van getRekening of maakOver voor deze
+     * @return true als de laatste aanroep van getRekening of maakOver voor deze
      * sessie minder dan GELDIGHEIDSDUUR geleden is
      * en er geen communicatiestoornis in de tussentijd is opgetreden,
      * anders false
@@ -45,4 +46,6 @@ public interface IBankiersessie extends RemotePublisher {
      * @throws RemoteException
      */
     IRekening getRekening() throws InvalidSessionException, RemoteException;
+
+    void setChangeListener(RemotePropertyListener listener) throws RemoteException;
 }

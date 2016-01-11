@@ -67,7 +67,7 @@ public class BankierSessieController extends UnicastRemoteObject implements Init
         this.application = application;
 
         try {
-            sessie.addListener(this, null);
+            sessie.setChangeListener(this);
             setRekening(sessie.getRekening());
         } catch (InvalidSessionException ex) {
             taMessage.setText("bankiersessie is verlopen");

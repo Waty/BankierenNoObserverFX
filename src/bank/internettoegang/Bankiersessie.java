@@ -3,27 +3,23 @@ package bank.internettoegang;
 import bank.bankieren.IBank;
 import bank.bankieren.IRekening;
 import bank.bankieren.Money;
-import fontys.observer.BasicPublisher;
+import fontys.observer.RemotePropertyListener;
 import fontys.util.InvalidSessionException;
 import fontys.util.NumberDoesntExistException;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Observable;
-import java.util.Observer;
 
-public class Bankiersessie extends BasicPublisher implements IBankiersessie, Observer {
+public class Bankiersessie extends UnicastRemoteObject implements IBankiersessie {
+    private final int reknr;
+    private final IBank bank;
     private long laatsteAanroep;
-    private int reknr;
-    private IBank bank;
+    private RemotePropertyListener listener;
 
     public Bankiersessie(int reknr, IBank bank) throws RemoteException {
-        super(new String[]{});
-        UnicastRemoteObject.exportObject(this, 0);
         laatsteAanroep = System.currentTimeMillis();
         this.reknr = reknr;
         this.bank = bank;
-        bank.addObserver(this);
     }
 
     public boolean isGeldig() {
@@ -54,16 +50,14 @@ public class Bankiersessie extends BasicPublisher implements IBankiersessie, Obs
     }
 
     @Override
-    public void logUit() throws RemoteException {
-        UnicastRemoteObject.unexportObject(this, true);
-        bank.deleteObserver(this);
+    public void setChangeListener(RemotePropertyListener listener) throws RemoteException {
+        this.listener = listener;
+        bank.addListener(listener, reknr + "");
     }
 
     @Override
-    public void update(Observable observable, Object o) {
-        System.out.println(o);
-        if (((IRekening) o).getNr() == reknr) {
-            Bankiersessie.this.inform(Bankiersessie.this, null, null, o);
-        }
+    public void logUit() throws RemoteException {
+        bank.removeListener(listener, reknr + "");
+        UnicastRemoteObject.unexportObject(this, true);
     }
 }
