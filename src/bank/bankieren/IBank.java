@@ -3,6 +3,8 @@ package bank.bankieren;
 import fontys.observer.RemotePublisher;
 import fontys.util.NumberDoesntExistException;
 
+import java.rmi.RemoteException;
+
 /**
  * @author 871059
  */
@@ -18,7 +20,7 @@ public interface IBank extends RemotePublisher {
      * @return -1 zodra naam of plaats een lege string en anders het nummer van de
      * gecreeerde bankrekening
      */
-    int openRekening(String naam, String plaats);
+    int openRekening(String naam, String plaats) throws RemoteException;
 
     /**
      * er wordt bedrag overgemaakt van de bankrekening met nummer bron naar de

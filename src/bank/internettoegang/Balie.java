@@ -9,7 +9,6 @@ import java.util.Random;
 
 public class Balie extends UnicastRemoteObject implements IBalie {
 
-    private static final long serialVersionUID = -4194975069137290780L;
     private static final String CHARS = "abcdefghijklmnopqrstuvwxyz0123456789";
     private IBank bank;
     private HashMap<String, ILoginAccount> loginaccounts;
@@ -23,7 +22,7 @@ public class Balie extends UnicastRemoteObject implements IBalie {
         random = new Random();
     }
 
-    public String openRekening(String naam, String plaats, String wachtwoord) {
+    public String openRekening(String naam, String plaats, String wachtwoord) throws RemoteException {
         if (naam.equals("") || plaats.equals("")) return null;
 
         if (wachtwoord.length() < 4 || wachtwoord.length() > 8) return null;
@@ -54,6 +53,4 @@ public class Balie extends UnicastRemoteObject implements IBalie {
         }
         return s.toString();
     }
-
-
 }

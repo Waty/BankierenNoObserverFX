@@ -31,9 +31,7 @@ public interface IBankiersessie extends Remote {
      * @throws NumberDoesntExistException als bestemming onbekend is
      * @throws InvalidSessionException    als sessie niet meer geldig is
      */
-    boolean maakOver(int bestemming, Money bedrag)
-            throws NumberDoesntExistException, InvalidSessionException,
-            RemoteException;
+    boolean maakOver(int bestemming, Money bedrag) throws NumberDoesntExistException, InvalidSessionException, RemoteException;
 
     /**
      * sessie wordt beeindigd

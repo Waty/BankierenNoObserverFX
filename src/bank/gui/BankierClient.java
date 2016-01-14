@@ -58,15 +58,12 @@ public class BankierClient extends Application {
     }
 
     protected IBalie connectToBalie(String bankName) {
-        try {
-            FileInputStream in = new FileInputStream(bankName + ".props");
+        try (FileInputStream in = new FileInputStream(bankName + ".props")) {
             Properties props = new Properties();
             props.load(in);
             String rmiBalie = props.getProperty("balie");
-            in.close();
 
-            IBalie balie = (IBalie) Naming.lookup("rmi://" + rmiBalie);
-            return balie;
+            return (IBalie) Naming.lookup("rmi://" + rmiBalie);
 
         } catch (Exception exc) {
             exc.printStackTrace();
@@ -112,14 +109,11 @@ public class BankierClient extends Application {
 
     private Initializable replaceSceneContent(String fxml) throws Exception {
         FXMLLoader loader = new FXMLLoader();
-        InputStream in = BankierClient.class.getResourceAsStream(fxml);
         loader.setBuilderFactory(new JavaFXBuilderFactory());
         loader.setLocation(BankierClient.class.getResource(fxml));
         AnchorPane page;
-        try {
+        try (InputStream in = BankierClient.class.getResourceAsStream(fxml)) {
             page = loader.load(in);
-        } finally {
-            in.close();
         }
         Scene scene = new Scene(page, 800, 600);
         // scene.getStylesheets().add("bank/gui/ING.css");

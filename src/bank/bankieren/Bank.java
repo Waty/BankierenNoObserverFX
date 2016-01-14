@@ -1,36 +1,37 @@
 package bank.bankieren;
 
+import bank.centrale.ICentraleBank;
 import fontys.observer.BasicPublisher;
 import fontys.util.NumberDoesntExistException;
 
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.*;
 
-public class Bank extends BasicPublisher implements IBank {
+public class Bank extends BasicPublisher implements IBank, ISecureBank {
 
-    private final Map<Integer, IRekeningTbvBank> accounts;
-    private final Collection<IKlant> clients;
+    private final Map<Integer, IRekeningTbvBank> accounts = new HashMap<>();
+    private final Collection<IKlant> clients = new ArrayList<>();
     private final String name;
-    private int nieuwReknr;
+    private final ICentraleBank centraleBank;
 
-    public Bank(String name) {
+    public Bank(String name) throws RemoteException, MalformedURLException, NotBoundException {
         super(new String[]{});
-        accounts = new HashMap<>();
-        clients = new ArrayList<>();
-        nieuwReknr = 100000000;
         this.name = name;
+
+        centraleBank = (ICentraleBank) Naming.lookup("rmi://localhost:12345/centralbank");
     }
 
-    public int openRekening(String name, String city) {
+    public int openRekening(String name, String city) throws RemoteException {
         if (name.equals("") || city.equals("")) return -1;
 
-        IKlant klant = getKlant(name, city);
-        synchronized (accounts) {
-            IRekeningTbvBank account = new Rekening(nieuwReknr, klant, Money.EURO);
-            accounts.put(nieuwReknr, account);
-            addProperty(nieuwReknr + "");
-            nieuwReknr++;
-            return nieuwReknr - 1;
-        }
+        int rekeningNr = centraleBank.getUniqueRekNr(this);
+        IRekeningTbvBank account = new Rekening(rekeningNr, getKlant(name, city), Money.EURO);
+        accounts.put(rekeningNr, account);
+        addProperty(rekeningNr + "");
+        return rekeningNr;
     }
 
     private IKlant getKlant(String name, String city) {
@@ -51,11 +52,19 @@ public class Bank extends BasicPublisher implements IBank {
         if (!money.isPositive()) throw new RuntimeException("money must be positive");
 
         IRekeningTbvBank source_account = (IRekeningTbvBank) getRekening(src);
-        if (source_account == null) throw new NumberDoesntExistException("account " + src + " unknown at " + name);
-
         IRekeningTbvBank dest_account = (IRekeningTbvBank) getRekening(dst);
-        if (dest_account == null) throw new NumberDoesntExistException("account " + dst + " unknown at " + name);
 
+        if (source_account != null && dest_account != null) {
+            return internalTransfer(money, source_account, dest_account);
+        } else try {
+            return centraleBank.maakOver(src, dst, money);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private boolean internalTransfer(Money money, IRekeningTbvBank source_account, IRekeningTbvBank dest_account) {
         synchronized (accounts) {
             Money negative = Money.difference(new Money(0, money.getCurrency()), money);
             boolean success = source_account.muteer(negative);
@@ -77,5 +86,11 @@ public class Bank extends BasicPublisher implements IBank {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean muteer(int nr, Money money) throws RemoteException {
+        IRekeningTbvBank rekening = (IRekeningTbvBank) getRekening(nr);
+        return rekening.muteer(money);
     }
 }

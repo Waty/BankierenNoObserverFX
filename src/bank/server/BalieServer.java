@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.registry.LocateRegistry;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -69,7 +70,7 @@ public class BalieServer extends Application {
             Naming.rebind(nameBank, new Balie(new Bank(nameBank)));
             return true;
 
-        } catch (IOException ex) {
+        } catch (IOException | NotBoundException ex) {
             Logger.getLogger(BalieServer.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;

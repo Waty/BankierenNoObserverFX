@@ -33,4 +33,3 @@ public interface IBalie extends Remote {
     IBankiersessie logIn(String accountnaam, String wachtwoord) throws RemoteException;
 
 }
-
