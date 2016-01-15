@@ -57,7 +57,9 @@ public class Bank extends BasicPublisher implements IBank, ISecureBank, AutoClos
 
         if (source_account != null && dest_account != null) {
             return internalTransfer(money, source_account, dest_account);
-        } else try {
+        }
+
+        try {
             return centraleBank.maakOver(src, dst, money);
         } catch (RemoteException e) {
             e.printStackTrace();
