@@ -1,5 +1,6 @@
 package bank.bankieren;
 
+import bank.centrale.CentraleBank;
 import fontys.util.NumberDoesntExistException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,7 +15,7 @@ public class BankTest {
 
     @Before
     public void setUp() throws Exception {
-        bank = new Bank(NAME);
+        bank = new Bank(new CentraleBank(), NAME);
     }
 
     @Test

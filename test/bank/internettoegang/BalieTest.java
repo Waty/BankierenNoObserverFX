@@ -1,6 +1,7 @@
 package bank.internettoegang;
 
 import bank.bankieren.Bank;
+import bank.centrale.CentraleBank;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,7 +13,7 @@ public class BalieTest {
 
     @Before
     public void setUp() throws Exception {
-        balie = new Balie(new Bank("ING"));
+        balie = new Balie(new Bank(new CentraleBank(), "ING"));
     }
 
     @Test

@@ -3,6 +3,7 @@ package bank.internettoegang;
 import bank.bankieren.Bank;
 import bank.bankieren.IBank;
 import bank.bankieren.Money;
+import bank.centrale.CentraleBank;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,10 +19,12 @@ public class BankiersessieTest {
     IBank bank;
     IBankiersessie bankiersessie;
     private String rekening;
+    private CentraleBank centraleBank;
 
     @Before
     public void setUp() throws Exception {
-        bank = new Bank("TestBank");
+        centraleBank = new CentraleBank();
+        bank = new Bank(centraleBank, "TestBank");
         balie = new Balie(bank);
         rekening = balie.openRekening(HENK, TILBURG, TEST);
         bankiersessie = balie.logIn(rekening, TEST);

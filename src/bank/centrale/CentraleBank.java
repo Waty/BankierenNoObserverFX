@@ -6,27 +6,14 @@ import fontys.util.NumberDoesntExistException;
 
 import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 public class CentraleBank extends UnicastRemoteObject implements ICentraleBank, AutoCloseable {
     final Map<Integer, ISecureBank> data = new HashMap<>();
 
-    protected CentraleBank() throws RemoteException {
-        LocateRegistry.createRegistry(12345).rebind("centralbank", this);
-    }
-
-    public static void main(String[] arg) {
-        try (CentraleBank ignored = new CentraleBank()) {
-            System.out.println("CB has started");
-            new Scanner(System.in).next();
-            System.out.println("CB is closing");
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+    public CentraleBank() throws RemoteException {
     }
 
     @Override

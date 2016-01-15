@@ -5,23 +5,24 @@ import fontys.observer.BasicPublisher;
 import fontys.util.NumberDoesntExistException;
 
 import java.net.MalformedURLException;
-import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
-public class Bank extends BasicPublisher implements IBank, ISecureBank {
+public class Bank extends BasicPublisher implements IBank, ISecureBank, AutoCloseable {
 
     private final Map<Integer, IRekeningTbvBank> accounts = new HashMap<>();
     private final Collection<IKlant> clients = new ArrayList<>();
     private final String name;
     private final ICentraleBank centraleBank;
 
-    public Bank(String name) throws RemoteException, MalformedURLException, NotBoundException {
+    public Bank(ICentraleBank centraleBank, String name) throws RemoteException, MalformedURLException, NotBoundException {
         super(new String[]{});
-        this.name = name;
+        UnicastRemoteObject.exportObject(this, 0);
 
-        centraleBank = (ICentraleBank) Naming.lookup("rmi://localhost:12345/centralbank");
+        this.centraleBank = centraleBank;
+        this.name = name;
     }
 
     public int openRekening(String name, String city) throws RemoteException {
@@ -92,5 +93,10 @@ public class Bank extends BasicPublisher implements IBank, ISecureBank {
     public boolean muteer(int nr, Money money) throws RemoteException {
         IRekeningTbvBank rekening = (IRekeningTbvBank) getRekening(nr);
         return rekening.muteer(money);
+    }
+
+    @Override
+    public void close() throws Exception {
+        UnicastRemoteObject.unexportObject(this, true);
     }
 }
