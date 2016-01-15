@@ -94,7 +94,9 @@ public class Bank extends BasicPublisher implements IBank, ISecureBank, AutoClos
     @Override
     public boolean muteer(int nr, Money money) throws RemoteException {
         IRekeningTbvBank rekening = (IRekeningTbvBank) getRekening(nr);
-        return rekening.muteer(money);
+        boolean succes = rekening.muteer(money);
+        if (succes) inform(this, nr + "", null, rekening);
+        return succes;
     }
 
     @Override
