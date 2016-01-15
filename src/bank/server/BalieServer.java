@@ -26,6 +26,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -69,8 +70,13 @@ public class BalieServer extends Application {
             Properties props = new Properties();
             props.setProperty("balie", String.format("%s:%d/%s", InetAddress.getLocalHost().getHostAddress(), port, nameBank));
             props.store(out, null);
-            LocateRegistry.createRegistry(port);
-            Naming.rebind(nameBank, new Balie(new Bank(getCentraleBank(), nameBank)));
+
+            try {
+                Registry registry = LocateRegistry.getRegistry(port);
+                registry.rebind(nameBank, new Balie(new Bank(getCentraleBank(), nameBank)));
+            } catch (Exception x) {
+                LocateRegistry.createRegistry(port).rebind(nameBank, new Balie(new Bank(getCentraleBank(), nameBank)));
+            }
             return true;
 
         } catch (IOException | NotBoundException ex) {
