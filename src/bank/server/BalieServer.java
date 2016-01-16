@@ -21,12 +21,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.ExportException;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -71,12 +71,8 @@ public class BalieServer extends Application {
             props.setProperty("balie", String.format("%s:%d/%s", InetAddress.getLocalHost().getHostAddress(), port, nameBank));
             props.store(out, null);
 
-            try {
-                Registry registry = LocateRegistry.getRegistry(port);
-                registry.rebind(nameBank, new Balie(new Bank(getCentraleBank(), nameBank)));
-            } catch (Exception x) {
-                LocateRegistry.createRegistry(port).rebind(nameBank, new Balie(new Bank(getCentraleBank(), nameBank)));
-            }
+            ICentraleBank centraleBank = (ICentraleBank) Naming.lookup("rmi://localhost:12345/centralbank");
+            initOrGetRegistry(port).rebind(nameBank, new Balie(new Bank(centraleBank, nameBank)));
             return true;
 
         } catch (IOException | NotBoundException ex) {
@@ -85,8 +81,12 @@ public class BalieServer extends Application {
         return false;
     }
 
-    private ICentraleBank getCentraleBank() throws RemoteException, NotBoundException, MalformedURLException {
-        return (ICentraleBank) Naming.lookup("rmi://localhost:12345/centralbank");
+    private Registry initOrGetRegistry(int port) throws RemoteException {
+        try {
+            return LocateRegistry.createRegistry(port);
+        } catch (ExportException ignored) {
+            return LocateRegistry.getRegistry(port);
+        }
     }
 
     public void gotoBankSelect() {
