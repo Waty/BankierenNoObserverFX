@@ -42,14 +42,11 @@ public class BankSelectController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
 
         cbSelectBank.getItems().addAll(FXCollections.observableArrayList("RaboBank", "ING", "SNS", "ABN AMRO", "ASN"));
-        cbSelectBank.valueProperty().addListener(new ChangeListener() {
-                                                     @Override
-                                                     public void changed(ObservableValue ov, Object t, Object t1) {
-                                                         bankNaam = (String) ov.getValue();
-                                                         IBalie balie = application.connectToBalie(bankNaam);
-                                                         application.gotoLogin(balie, "");
-                                                     }
-                                                 }
+        cbSelectBank.valueProperty().addListener((observable, oldValue, newValue) -> {
+            bankNaam = observable.getValue();
+            IBalie balie = application.connectToBalie(bankNaam);
+            application.gotoLogin(balie, "");
+        }
         );
     }
 

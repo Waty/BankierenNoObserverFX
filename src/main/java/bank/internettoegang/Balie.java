@@ -13,7 +13,7 @@ public class Balie extends UnicastRemoteObject implements IBalie {
     private IBank bank;
     private HashMap<String, ILoginAccount> loginaccounts;
     //private Collection<IBankiersessie> sessions;
-    private java.util.Random random;
+    private Random random;
 
     public Balie(IBank bank) throws RemoteException {
         this.bank = bank;
