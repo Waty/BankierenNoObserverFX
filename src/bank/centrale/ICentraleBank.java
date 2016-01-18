@@ -8,7 +8,9 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface ICentraleBank extends Remote {
-    int getUniqueRekNr(ISecureBank bank) throws RemoteException;
+    int getUniqueRekNr(String bankName) throws RemoteException;
+
+    void registerBank(String bankName, ISecureBank bank) throws RemoteException;
 
     boolean maakOver(int source, int destination, Money amount) throws RemoteException, NumberDoesntExistException;
 }

@@ -23,12 +23,14 @@ public class Bank extends BasicPublisher implements IBank, ISecureBank, AutoClos
 
         this.centraleBank = centraleBank;
         this.name = name;
+
+        centraleBank.registerBank(name, this);
     }
 
     public int openRekening(String name, String city) throws RemoteException {
         if (name.equals("") || city.equals("")) return -1;
 
-        int rekeningNr = centraleBank.getUniqueRekNr(this);
+        int rekeningNr = centraleBank.getUniqueRekNr(this.name);
         IRekeningTbvBank account = new Rekening(rekeningNr, getKlant(name, city), Money.EURO);
         accounts.put(rekeningNr, account);
         addProperty(rekeningNr + "");

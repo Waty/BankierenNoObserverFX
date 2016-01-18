@@ -30,8 +30,8 @@ public class CentraleBankTest {
 
     @Test
     public void testGetUniqueRekNr() throws Exception {
-        int r1 = centraleBank.getUniqueRekNr(rabo);
-        int r2 = centraleBank.getUniqueRekNr(ing);
+        int r1 = centraleBank.getUniqueRekNr(rabo.getName());
+        int r2 = centraleBank.getUniqueRekNr(ing.getName());
         assertNotEquals(r1, r2);
     }
 

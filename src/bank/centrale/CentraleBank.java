@@ -11,29 +11,45 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CentraleBank extends UnicastRemoteObject implements ICentraleBank, AutoCloseable {
-    final Map<Integer, ISecureBank> data = new HashMap<>();
+    final Map<Integer, String> rekeningen = new HashMap<>();
+    private final Map<String, ISecureBank> banken = new HashMap<>();
 
     public CentraleBank() throws RemoteException {
     }
 
     @Override
-    public int getUniqueRekNr(ISecureBank bank) throws RemoteException {
-        synchronized (data) {
+    public int getUniqueRekNr(String bankName) throws RemoteException {
+        synchronized (rekeningen) {
             for (int i = 0; ; i++) {
-                if (!data.containsKey(i)) {
-                    data.put(i, bank);
+                if (!rekeningen.containsKey(i)) {
+                    rekeningen.put(i, bankName);
                     return i;
                 }
             }
         }
     }
 
+    /**
+     * Reigsters the ISecureBank instance in the banken map
+     *
+     * @param bankName name of the bank
+     * @param bank     instance of the RMI proxy
+     */
+    @Override
+    public void registerBank(String bankName, ISecureBank bank) {
+        banken.put(bankName, bank);
+    }
+
+    ISecureBank getBankForRekening(int rekNr) throws NumberDoesntExistException {
+        String bankName = rekeningen.get(rekNr);
+        if (bankName == null) throw new NumberDoesntExistException("account " + rekNr + " is unknown");
+        return banken.get(bankName);
+    }
+
     @Override
     public boolean maakOver(int source, int destination, Money money) throws RemoteException, NumberDoesntExistException {
-        ISecureBank src = data.get(source);
-        if (src == null) throw new NumberDoesntExistException("account " + source + " is unknown");
-        ISecureBank dst = data.get(destination);
-        if (dst == null) throw new NumberDoesntExistException("account " + destination + " is unknown");
+        ISecureBank src = getBankForRekening(source);
+        ISecureBank dst = getBankForRekening(destination);
 
         Money negative = Money.difference(new Money(0, money.getCurrency()), money);
         boolean success = src.muteer(source, negative);
